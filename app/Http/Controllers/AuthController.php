@@ -106,7 +106,7 @@ class AuthController extends Controller
             ], 200);
         }
 
-
+    // doesn't work as a PUT Http method; fix it
     public function personal_information(Request $request)
     {
         $validate = Validator::make($request->only(['first_name', 'last_name', 'location', 'image']),
@@ -114,32 +114,39 @@ class AuthController extends Controller
                 "first_name" => 'regex:/^[a-zA-Z]{1,30}$/',
                 "last_name"  => 'regex:/^[a-zA-Z]{1,30}$/',
                 "location"   => 'regex:/^[a-zA-Z0-9\s,.-]{1,100}$/',
-                'image'      => 'image|mimes:jpeg,png,jpg,gif,svg'/*|max:2048'*/,
+                'image'      => 'image|mimes:jpeg,png,jpg,gif,svg',
             ]);
-
-        if($validate->fails())
-        return response()->json([
-            "Response Message" => "Invalid",
-            "Errors" => $validate->errors()
-        ] , 400);
-
+        if ($validate->fails()) {
+            return response()->json([
+                "Response Message" => "Invalid",
+                "Errors" => $validate->errors()
+            ], 400);
+        }
         $validatedData = $validate->validated();
-        if ($request->hasFile('image'))
-        {
+        $user = auth('api')->user();
+        // Update only if there is new data
+        if (isset($validatedData['first_name'])) {
+            $user->first_name = $validatedData['first_name'];
+        }
+        if (isset($validatedData['last_name'])) {
+            $user->last_name = $validatedData['last_name'];
+        }
+        if (isset($validatedData['location'])) {
+            $user->location = $validatedData['location'];
+        }
+        if ($request->hasFile('image')) {
             $fileName = time() . '_' . $request->file('image')->getClientOriginalName();
             $path = $request->file('image')->storeAs('images', $fileName, 'public');
             $validatedData["image"] = '/storage/' . $path;
+            $user->image = $validatedData["image"];
         }
-
-        $user = auth('api')->user();
-        $user->fill(array_merge($user->toArray(), $validatedData));
         $user->save();
-
         return response()->json([
-            "Message" => "added successfully",
+            "Message" => "Updated successfully",
             "User" => $user,
         ], 200);
     }
+
 
     function me() {
         return response()->json([
