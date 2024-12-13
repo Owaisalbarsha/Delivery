@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Store extends Model
 {
@@ -20,12 +21,12 @@ class Store extends Model
     ];
 
     /**
-     * The roles that belong to the Store
+     * The products that belong to the Store.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function products(): BelongsToMany
+    public function products()
     {
-        return $this->belongsToMany(Product::class, 'product_store');
+        return $this->belongsToMany(Product::class, 'store_product');
     }
 }

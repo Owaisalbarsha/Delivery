@@ -165,5 +165,20 @@ class ProductController extends Controller
 
         return response()->json(null, 204);
     }
+
+    public function search($name)
+    {
+        $product = Product::where('name', $name)->first();
+        
+        if(!$product)
+            return response()->json([
+                "Message : " => "Product Not Found"
+            ], 200);
+
+        return response()->json([
+            "Message : " => "Product Retrieved Successflly",
+            "Product : " => $product
+        ], 400);
+    }
 }
 

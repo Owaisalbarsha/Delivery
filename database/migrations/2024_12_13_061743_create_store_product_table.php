@@ -9,23 +9,21 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('product_store', function (Blueprint $table) {
+        Schema::create('store_product', function (Blueprint $table) {
             $table->id();
-            $table->integer('product_id')->onDelete('cascade');
             $table->integer('store_id')->onDelete('cascade');
+            $table->integer('product_id')->onDelete('cascade');
             $table->timestamps();
         });
     }
 
-    public function down()
-    {
-        Schema::dropIfExists('product_store');
-    }
-
-
     /**
      * Reverse the migrations.
      */
+    public function down(): void
+    {
+        Schema::dropIfExists('store_product');
+    }
 };

@@ -37,7 +37,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {  // token based a
     Route::put('/product/update', [ProductController::class, 'update']);
     Route::delete('/product/delete', [ProductController::class, 'destroy']);*/
     Route::resource('products', ProductController::class);
-
+    Route::get('products/search/{name}', [ProductController::class, 'search']);
     //Store:
     /*Route::get('/store/index', [ProductController::class, 'index']);
     Route::post('/store/store', [ProductController::class, 'store']);
@@ -45,10 +45,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {  // token based a
     Route::put('/store/update', [ProductController::class, 'update']);
     Route::delete('/store/delete', [ProductController::class, 'destroy']);*/
     Route::resource('stores', StoreController::class);
-    Route::delete('stores/destroy/{id}', [StoreController::class, 'destroy']);
+    Route::get('stores/storeproducts/{id}', [StoreController::class, 'storeProducts']);
+    Route::get('stores/search/{name}', [StoreController::class, 'search']);
 });
 
 // test
 Route::post('/send-verification-code', [AuthController::class, 'sendVerificationCode']);
 Route::post('/verify-code', [AuthController::class, 'verifyCode']);
 
+// adding products to stores

@@ -19,6 +19,23 @@ class StoreController extends Controller
             "stores" => $stores,
         ], 200);
     }
+    public function storeProducts($id)
+    {
+        $store = Store::find($id);
+
+        if (!$store) {
+            return response()->json([
+                "message" => "Store not found"
+            ], 404);
+        }
+
+        $products = $store->products;
+
+        return response()->json([
+            "message" => "Store $id products retrieved successfully",
+            "products" => $products
+        ], 200);
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -156,5 +173,20 @@ class StoreController extends Controller
         $product->forceDelete();
 
         return response()->json(null, 204);
+    }
+    public function search($name)
+    {
+        $store = Store::where('name', $name)->first();
+        //$store = Store::whereRaw('LOWER(name) = ?', [strtolower($name)])->first();
+
+        if(!$store)
+            return response()->json([
+                "Message : " => "Store Not Found"
+            ], 200);
+
+        return response()->json([
+            "Message : " => "Store Retrieved Successflly",
+            "Store : " => $store
+        ], 400);
     }
 }
