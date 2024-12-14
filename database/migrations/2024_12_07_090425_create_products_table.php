@@ -15,13 +15,14 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('description');
+            $table->string('brand');
             //$table->string('company');
             $table->integer('quantity');
             $table->double('price');
             $table->string('image');
-            $table->softDeletes();
             //$table->timestamp('expiration_date')->nullable('false');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

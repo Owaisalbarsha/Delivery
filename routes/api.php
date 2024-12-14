@@ -5,6 +5,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\StoreController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\OrderController;
+
 use App\Http\Controllers\Illuminate\Support\Facades\Response;
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +26,7 @@ Route::get('/user', function (Request $request) {
 Route::post('/login',[AuthController::class,'login']);
 Route::post('/register',[AuthController::class,'register']);
 
+// authorization changes when : Admin, Driver, User
 Route::group(['middleware' => ['auth:sanctum']], function () {  // token based auth using api tokens
 
     Route::get('/image', [AuthController::class, 'getUserProfilePicture']); // test
@@ -47,6 +51,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {  // token based a
     Route::resource('stores', StoreController::class);
     Route::get('stores/storeproducts/{id}', [StoreController::class, 'storeProducts']);
     Route::get('stores/search/{name}', [StoreController::class, 'search']);
+
+    // Cart:
+    Route::resource('carts', CartController::class);
+    Route::resource('orders', OrderController::class);
 });
 
 // test

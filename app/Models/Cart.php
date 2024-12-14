@@ -8,23 +8,16 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Product extends Model
+class Cart extends Model
 {
     use HasApiTokens, HasFactory, Notifiable;
     use SoftDeletes;
 
     protected $fillable = [
-        'name',
-        'description',
-        'brand',
-        'quantity',
-        //'expiration_date',
-        'price',
-        'image',
+        'user_id',
+        'store_id',
+        'product_id',
+        'order_quantity',
+        'price'
     ];
-
-    public function stores()
-    {
-        return $this->belongsToMany(Store::class, 'store_product');
-    }
 }
