@@ -62,3 +62,4 @@ Route::post('/send-verification-code', [AuthController::class, 'sendVerification
 Route::post('/verify-code', [AuthController::class, 'verifyCode']);
 
 // adding products to stores
+Route::get('/testrole',[TestController::class, 'testrole'])->middleware('role:admin');//test role
