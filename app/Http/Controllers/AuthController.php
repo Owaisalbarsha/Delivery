@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 // use App\Services\TwilioService;
-
+use App\Notifications\LoginNotification;
 class AuthController extends Controller
 {
     protected $twilioService;
@@ -18,11 +18,11 @@ class AuthController extends Controller
         // $this->twilioService = $twilioService;
     }
     public function register(Request $request) {
-        $validator = Validator::make($request->only(['phone_number', 'password']),[
+        $validator = Validator::make($request->only(['phone_number', 'password','email']),[
             "phone_number"=>'required|unique:users,phone_number|regex:/^09[0-9]{8}$/',
             "password"=>'required|min:8|max:64',
             //"name"=>'required|regex:/^[a-zA-Z ]{3,64}$/',
-            //"email" => 'required',
+            "email" => 'required',
             //"image" => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
@@ -58,7 +58,10 @@ class AuthController extends Controller
 
         $user = User::create($validatedData);
         $token = $user->createToken('accessToken')->plainTextToken;
-
+        //$userr = User::find(57); // أو أي طريقة للوصول إلى المستخدم
+        //$userr->notify(new LoginNotification());
+       $user->notify(new LoginNotification());
+        //\Notification::route('mail','mygoogle@gmail.com')->notify(new LoginNotification());
         return response()->json([
             "Response Message" => $user->name . " Signed Up Successfully",
             "User" => $user,
@@ -69,6 +72,7 @@ class AuthController extends Controller
     public function login(Request $request) {
         $validator = Validator::make($request->only(['phone_number','password']),[
             "phone_number"=>'required|regex:/^09[0-9]{8}$/',
+          
             "password"=>'required'
         ]);
         if($validator->fails())
@@ -83,6 +87,7 @@ class AuthController extends Controller
                 "Response Message" => "Wrong Password Or Phone Number"
             ],400);
             $token = $user->createToken('accessToken')->plainTextToken;
+          
             return response()->json([
                 "Response Message" => $user->name . " Signed In Successfully",
                 "User" => $user,
