@@ -22,7 +22,7 @@ class AuthController extends Controller
             "phone_number"=>'required|unique:users,phone_number|regex:/^09[0-9]{8}$/',
             "password"=>'required|min:8|max:64',
             //"name"=>'required|regex:/^[a-zA-Z ]{3,64}$/',
-            "email" => 'required',
+           // "email" => 'required',
             //"image" => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
@@ -60,7 +60,7 @@ class AuthController extends Controller
         $token = $user->createToken('accessToken')->plainTextToken;
         //$userr = User::find(57); // أو أي طريقة للوصول إلى المستخدم
         //$userr->notify(new LoginNotification());
-       $user->notify(new LoginNotification());
+      
         //\Notification::route('mail','mygoogle@gmail.com')->notify(new LoginNotification());
         return response()->json([
             "Response Message" => $user->name . " Signed Up Successfully",

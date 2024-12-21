@@ -8,6 +8,7 @@ use App\Http\Controllers\StoreController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\TestController;
 use App\Http\Controllers\Illuminate\Support\Facades\Response;
 /*
 |--------------------------------------------------------------------------
@@ -66,3 +67,5 @@ Route::get('/testrole',[TestController::class, 'testrole'])->middleware('role:ad
 Route::post('addToFavorite',[FavoriteController::class,'addProductFavorite']);
 Route::get('getProductsFavorite',[FavoriteController::class,'getProductFavorite']);
 Route::post('orderFromFavorite',[FavoriteController::class,'store']);
+Route::get('sendEmail',[ProductController::class,'send']);
+Route::get('testNotification',[TestController::class,'test']);//test notification

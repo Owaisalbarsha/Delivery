@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Models\User;
+use App\Notifications\LoginNotification;
 
 class ProductController extends Controller
 {
@@ -180,5 +182,20 @@ class ProductController extends Controller
             "Product : " => $product
         ], 400);
     }
-}
+
+
+    
+    
+        public function send()
+        {
+            $user = User::find(1); // الحصول على المستخدم
+    
+            // إرسال الإشعار
+            $user->notify(new LoginNotification());
+    
+            return response()->json(['message' => 'Notification sent!']);
+        }
+    }
+    
+
 
