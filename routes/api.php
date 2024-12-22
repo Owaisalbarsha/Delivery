@@ -23,12 +23,14 @@ use App\Http\Controllers\Illuminate\Support\Facades\Response;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
-
+Route::middleware('setapplang')->prefix('{locale}')->group(function(){
 Route::post('/login',[AuthController::class,'login']);
 Route::post('/register',[AuthController::class,'register']);
 
+});
+
 // authorization changes when : Admin, Driver, User
-Route::group(['middleware' => ['auth:sanctum']], function () {  // token based auth using api tokens
+Route::group(['middleware' => ['auth:sanctum']], function () {  // token based auth using api tokens//يجب اضافة الsetapplang middleware
 
     Route::get('/image', [AuthController::class, 'getUserProfilePicture']); // test
     Route::get('/logout',[AuthController::class,'logout']);
@@ -68,4 +70,4 @@ Route::post('addToFavorite',[FavoriteController::class,'addProductFavorite']);
 Route::get('getProductsFavorite',[FavoriteController::class,'getProductFavorite']);
 Route::post('orderFromFavorite',[FavoriteController::class,'store']);
 Route::get('sendEmail',[ProductController::class,'send']);
-Route::get('testNotification',[TestController::class,'test']);//test notification
+Route::get('testNotification',[TestController::class,'test'])->middleware('auth:sanctum');//test notification

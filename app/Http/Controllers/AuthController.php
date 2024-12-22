@@ -22,13 +22,13 @@ class AuthController extends Controller
             "phone_number"=>'required|unique:users,phone_number|regex:/^09[0-9]{8}$/',
             "password"=>'required|min:8|max:64',
             //"name"=>'required|regex:/^[a-zA-Z ]{3,64}$/',
-           // "email" => 'required',
+            "email" => 'required',
             //"image" => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         if($validator->fails())
             return response()->json([
-                "Response Message" => "Invalid Credentials",
+                "Response Message" => __('auth.Invalid Credentials'),
                 "Errors" => $validator->errors()
             ] , 400);
 
@@ -58,12 +58,8 @@ class AuthController extends Controller
 
         $user = User::create($validatedData);
         $token = $user->createToken('accessToken')->plainTextToken;
-        //$userr = User::find(57); // أو أي طريقة للوصول إلى المستخدم
-        //$userr->notify(new LoginNotification());
-      
-        //\Notification::route('mail','mygoogle@gmail.com')->notify(new LoginNotification());
         return response()->json([
-            "Response Message" => $user->name . " Signed Up Successfully",
+            "Response Message" => $user->name . __('auth.Signed Up Successfully'),
             "User" => $user,
             "Token" => $token,
         ],200);
@@ -77,19 +73,19 @@ class AuthController extends Controller
         ]);
         if($validator->fails())
             return response()->json([
-                "Response Message" => "Invalid Credentials",
+                "Response Message" =>__('auth.Invalid Credentials'),
                 "Errors" => $validator->errors()
             ] , 400);
         $validatedData = $validator->validated();
         $user = User::where('phone_number',$validatedData['phone_number'])->first();
         if(!$user || !Hash::check($validatedData['password'], $user->password))
             return response()->json([
-                "Response Message" => "Wrong Password Or Phone Number"
+                "Response Message" => __('auth.Wrong Password Or Phone Number')
             ],400);
             $token = $user->createToken('accessToken')->plainTextToken;
           
             return response()->json([
-                "Response Message" => $user->name . " Signed In Successfully",
+                "Response Message" => $user->name . __('auth.Signed In Successfully'),
                 "User" => $user,
                 "Token" => $token
             ] , 200);

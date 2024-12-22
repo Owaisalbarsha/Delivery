@@ -9,5 +9,6 @@ class TestController extends Controller
     public function test(){
         //$user = auth('api')->user();
         User::find(4)->notify(new ProductNotification());
+        
     }
 }
