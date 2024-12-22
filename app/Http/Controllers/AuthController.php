@@ -18,9 +18,10 @@ class AuthController extends Controller
         // $this->twilioService = $twilioService;
     }
     public function register(Request $request) {
-        $validator = Validator::make($request->only(['phone_number', 'password','email']),[
+        $validator = Validator::make($request->all(),[
             "phone_number"=>'required|unique:users,phone_number|regex:/^09[0-9]{8}$/',
             "password"=>'required|min:8|max:64',
+            "role" => 'required',
             //"name"=>'required|regex:/^[a-zA-Z ]{3,64}$/',
             "email" => 'required',
             //"image" => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
@@ -66,9 +67,9 @@ class AuthController extends Controller
     }
 
     public function login(Request $request) {
-        $validator = Validator::make($request->only(['phone_number','password']),[
+        $validator = Validator::make($request->all(),[
             "phone_number"=>'required|regex:/^09[0-9]{8}$/',
-          
+
             "password"=>'required'
         ]);
         if($validator->fails())
@@ -83,7 +84,7 @@ class AuthController extends Controller
                 "Response Message" => __('auth.Wrong Password Or Phone Number')
             ],400);
             $token = $user->createToken('accessToken')->plainTextToken;
-          
+
             return response()->json([
                 "Response Message" => $user->name . __('auth.Signed In Successfully'),
                 "User" => $user,

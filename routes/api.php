@@ -30,7 +30,10 @@ Route::post('/register',[AuthController::class,'register']);
 });
 
 // authorization changes when : Admin, Driver, User
-Route::group(['middleware' => ['auth:sanctum']], function () {  // token based auth using api tokens//يجب اضافة الsetapplang middleware
+// token based auth using api tokens//يجب اضافة الsetapplang middleware
+Route::group(['middleware' => ['auth:sanctum', 'role:admin']], function () {  // token based auth using api tokens
+    Route::get('/testrole',[TestController::class, 'test']);//test role
+
 
     Route::get('/image', [AuthController::class, 'getUserProfilePicture']); // test
     Route::get('/logout',[AuthController::class,'logout']);
@@ -65,6 +68,7 @@ Route::post('/send-verification-code', [AuthController::class, 'sendVerification
 Route::post('/verify-code', [AuthController::class, 'verifyCode']);
 
 // adding products to stores
+
 Route::get('/testrole',[TestController::class, 'testrole'])->middleware('role:admin');//test role
 Route::post('addToFavorite',[FavoriteController::class,'addProductFavorite']);
 Route::get('getProductsFavorite',[FavoriteController::class,'getProductFavorite']);
