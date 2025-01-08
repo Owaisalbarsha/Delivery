@@ -29,9 +29,8 @@ Route::post('/register',[AuthController::class,'register']);
 
 });
 
-// authorization changes when : Admin, Driver, User
-// token based auth using api tokens//يجب اضافة الsetapplang middleware
-Route::group(['middleware' => ['auth:sanctum', 'role:admin']], function () {  // token based auth using api tokens
+// authorization changes when : Admin, Driver, User token based auth using api
+Route::group(['middleware' => ['auth:sanctum', 'role:admin']], function () {  // setapplang middleware
     Route::get('/testrole',[TestController::class, 'test']);//test role
 
 
@@ -55,7 +54,7 @@ Route::group(['middleware' => ['auth:sanctum', 'role:admin']], function () {  //
     Route::put('/store/update', [ProductController::class, 'update']);
     Route::delete('/store/delete', [ProductController::class, 'destroy']);*/
     Route::resource('stores', StoreController::class);
-    Route::get('stores/storeproducts/{id}', [StoreController::class, 'storeProducts']);
+    Route::post('stores/storeproducts', [StoreController::class, 'storeProducts']);
     Route::get('stores/search/{name}', [StoreController::class, 'search']);
 
     // Cart:

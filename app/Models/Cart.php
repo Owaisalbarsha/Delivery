@@ -17,7 +17,7 @@ class Cart extends Model
         'user_id',
         'store_id',
         'product_id',
-        'order_quantity',
+        'product_quantity',
         'price'
     ];
 }

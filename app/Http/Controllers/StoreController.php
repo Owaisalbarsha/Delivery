@@ -14,14 +14,19 @@ class StoreController extends Controller
     public function index()
     {
         $stores = Store::all();
+
+        foreach ($stores as $store) {
+            $store->image = asset('storage/images/' . basename($store->image));
+        }
         return response()->json([
             "message" => "Stores retrieved successfully",
             "stores" => $stores,
         ], 200);
     }
-    public function storeProducts($id)
+    public function storeProducts(Request $request)
     {
-        $store = Store::find($id);
+        $name = $request->input('name');
+        $store = Store::where('name', $name)->first();
 
         if (!$store) {
             return response()->json([
@@ -31,8 +36,12 @@ class StoreController extends Controller
 
         $products = $store->products;
 
+        foreach ($products as $product) {
+            $product->image = asset('storage/images/' . basename($product->image));
+        }
+
         return response()->json([
-            "message" => "Store $id products retrieved successfully",
+            "message" => "Store $name products retrieved successfully",
             "products" => $products
         ], 200);
     }
@@ -67,6 +76,7 @@ class StoreController extends Controller
         $fileName = time() . '_' . $request->file('image')->getClientOriginalName();
         $path = $request->file('image')->storeAs('images', $fileName, 'public');
         $validatedData["image"] = '/storage/' . $path;
+        //$imageUrl = asset('storage/images/' . basename($user->image));
 
         $store = Store::create($validatedData);
 

@@ -16,6 +16,9 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::all();
+        foreach ($products as $product) {
+            $product->image = asset('storage/images/' . basename($product->image));
+        }
         return response()->json([
             "message" => "Products retrieved successfully",
             "products" => $products,
@@ -42,7 +45,8 @@ class ProductController extends Controller
             'quantity' => 'required|integer|min:1',
             //'expiration_date' => 'required|date|after:today',
             'price' => 'required|numeric|min:0',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'required|image',
+            'brand' => 'required'
         ]);
         if($validator->fails())
             return response()->json([
@@ -171,7 +175,7 @@ class ProductController extends Controller
     public function search($name)
     {
         $product = Product::where('name', $name)->first();
-        
+
         if(!$product)
             return response()->json([
                 "Message : " => "Product Not Found"
@@ -184,18 +188,18 @@ class ProductController extends Controller
     }
 
 
-    
-    
+
+
         public function send()
         {
             $user = User::find(1); // الحصول على المستخدم
-    
+
             // إرسال الإشعار
             $user->notify(new LoginNotification());
-    
+
             return response()->json(['message' => 'Notification sent!']);
         }
     }
-    
+
 
 

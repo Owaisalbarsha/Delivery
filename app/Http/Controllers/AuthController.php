@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 // use App\Services\TwilioService;
 use App\Notifications\LoginNotification;
+
 class AuthController extends Controller
 {
     protected $twilioService;
@@ -21,9 +22,9 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(),[
             "phone_number"=>'required|unique:users,phone_number|regex:/^09[0-9]{8}$/',
             "password"=>'required|min:8|max:64',
-            "role" => 'required',
+            //"role" => 'required',
             //"name"=>'required|regex:/^[a-zA-Z ]{3,64}$/',
-            "email" => 'required',
+            //"email" => 'required',
             //"image" => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
@@ -93,25 +94,35 @@ class AuthController extends Controller
     }
 
         // edit send error if no authorized
-        public function logout()
-        {
-            $user = auth('api')->user();
-
-            if (!$user) {
-                return response()->json(['message' => 'User not found'], 404);
-            }
-
-            $user->tokens()->delete();
-
-            return response()->json([
-                "Response Message" => $user->name . " Signed Off Successfully"
-            ], 200);
+    public function logout()
+    {
+        $user = auth('api')->user();
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
         }
+        $user->tokens()->delete();
+        return response()->json([
+            "Response Message" => $user->name . " Signed Off Successfully"
+        ], 200);
+    }
+
+    // for testing purposes:
+    public function image(Request $request)
+    {
+        $user = auth('api')->user();
+        if ($request->hasFile('image')) {
+            $fileName = time() . '_' . $request->file('image')->getClientOriginalName();
+            $path = $request->file('image')->storeAs('images', $fileName, 'public');
+            $im = '/storage/' . $path;
+            $user->image = $im;
+        }
+
+    }
 
     // doesn't work as a PUT Http method; fix it
     public function personal_information(Request $request)
     {
-        $validate = Validator::make($request->only(['first_name', 'last_name', 'location', 'image']),
+        $validate = Validator::make($request->all(),
             [
                 "first_name" => 'regex:/^[a-zA-Z]{1,30}$/',
                 "last_name"  => 'regex:/^[a-zA-Z]{1,30}$/',
@@ -151,9 +162,12 @@ class AuthController extends Controller
 
 
     function me() {
+        $user = auth('api')->user();
+        if($user->image != null)
+            $user->image = asset('storage/images/' . basename($user->image));
         return response()->json([
             "Response Message" => "Profile Data Received Successfully",
-            "User"=>auth('api')->user()
+            "User"=>$user
         ] , 200);
     }
 
