@@ -84,3 +84,4 @@ Route::get('getProductsFavorite',[FavoriteController::class,'getProductFavorite'
 Route::post('orderFromFavorite',[FavoriteController::class,'store']);
 Route::get('sendEmail',[ProductController::class,'send']);
 Route::get('testNotification',[TestController::class,'test'])->middleware('auth:sanctum');//test notification
+Route::get('changeStatusOfOrder',[OrderController::class, 'update'])->middleware('role:user');

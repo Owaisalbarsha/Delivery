@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Auth;
 use App\Models\Order;
 use Illuminate\Http\Request;
 
@@ -60,25 +60,36 @@ class OrderController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Order $order)
-    {
-        //
-    }
+
+     public function show()
+     {
+         $orders = Order::where('order_status', 'waiting')->get();
+         return response()->json($orders);
+     }
+     
+
+   
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(Order $order)
     {
-        //
+        
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Order $order)
+    public function update()
     {
-        //
+       // $driver = Auth::user();
+       $users = User::select('x&&y')->get();
+       $affectedRows = Order::where('x&&y',$users) ->update(['status' => 'shipped']);
+       return response()->json([
+        "Message : " => "The order is being delivered",
+        
+   ]);
     }
 
     /**

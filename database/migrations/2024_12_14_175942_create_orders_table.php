@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->integer('user_id');
             $table->integer('order_price');
-            $table->string('order_status');
+            $table->enum('order_status', ['pending', 'processed', 'shipped', 'delivered', 'canceled']);
+            $table->string('x&&y');
             $table->timestamps();
             $table->softDeletes();
         });
