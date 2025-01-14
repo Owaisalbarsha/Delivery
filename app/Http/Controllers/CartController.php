@@ -15,14 +15,11 @@ class CartController extends Controller
      */
     public function index()
     {
-        $cart = Cart::where('user_id', auth('api')->user()->id)->get();
-        if(!$cart){
-            return response()->json(["Message" => "Not Found"], 400);
-        }
-        //$cart['product_name'] = Product::where('id', $cart['product_id'])->value('name');
-        //$cart['store_name'] = Store::where('id', $cart['store_id'])->value('name');
+        $user = auth('api')->user();
+        $cart = $user->carts()->with('product')->get();
+
         return response()->json([
-            "Cart : " => $cart,
+            "Cart" => $cart,
             "Message : " => "Retrieved Successfully"
         ], 200);
     }
@@ -40,26 +37,34 @@ class CartController extends Controller
      */
     public function store(Request $request)
     {
-        /*
-        'user_id',
-        'store_id',
-        'product_id',
-        'order_quantity',
-        'price'
-        */
-        $user_id = auth('api')->user()->id;
-        $input = $request->all();
-        $product = Product::where('name', $input['name'])->first();
-        $input['user_id'] = $user_id;
-        $input['product_id'] = $product->id;
-        $input['price'] = $input['order_quantity']*$product->price;
-        $cart = Cart::create($input);
-        $cart->save();
+        $request->validate([
+            'name' => 'required|string|exists:products,name',
+            'quantity' => 'required|integer|min:1',
+        ]);
+        $user = $request->user();
 
-        return response()->json([
-            "Message : " => "Add to cart successfully",
-            "Cart : " => $cart
-        ], 200);
+        $product = Product::where('name', $request->name)->first();
+
+        if (!$product) {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
+
+        $cartItem = $user->carts()->where('product_id', $product->id)->first();
+
+        if ($cartItem) {
+            $cartItem->update([
+                'quantity' => $cartItem->quantity + $request->quantity,
+                'price' => $product->price * $request->quantity + $cartItem->price, // ضيف القديمة معها
+            ]);
+        } else {
+            $user->carts()->create([
+            'product_id' => $product->id,
+            'quantity' => $request->quantity,
+            'price' => $product->price * $request->quantity,
+            ]);
+        }
+
+        return response()->json(['message' => 'Product added to cart'], 200);
     }
 
     /**
@@ -81,25 +86,88 @@ class CartController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Cart $cart)
+    public function update(Request $request)
     {
-        //
+
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        $cart = Cart::find($id);
-        if(!$cart)
+        $request->validate([
+            'product_id' => 'required|integer|exists:products,id',
+        ]);
+
+        $user = auth('api')->user();
+
+        $cart = Cart::where('product_id', $request->product_id)
+                    ->where('user_id', $user->id)
+                    ->first();
+
+        if (!$cart) {
             return response()->json([
-                "Message" => "cart not found"
-            ], 400);
+                "message" => "Cart item not found or you do not have permission to delete it"
+            ], 404);
+        }
+
         $cart->delete();
 
         return response()->json([
-            "Message : " => "Deleted Successfully"
+            "message" => "Cart item deleted successfully"
+        ], 200);
+    }
+    public function increase(Request $request)
+    {
+        $request->validate([
+            'product_id' => 'required|integer|exists:products,id',
+        ]);
+
+        $user = auth('api')->user();
+
+        $cart = Cart::where('product_id', $request->product_id)
+                    ->where('user_id', $user->id)
+                    ->first();
+
+        if (!$cart) {
+            return response()->json([
+                "message" => "Cart item not found or you do not have permission to update it"
+            ], 404);
+        }
+
+        $cart->quantity += 1;
+        $cart->save();
+
+        return response()->json([
+            "message" => "Cart item quantity increased successfully",
+            "cart" => $cart
+        ], 200);
+    }
+    public function decrease(Request $request)
+    {
+        $request->validate([
+            'product_id' => 'required|integer|exists:products,id',
+        ]);
+
+        $user = auth('api')->user();
+
+        $cart = Cart::where('product_id', $request->product_id)
+                    ->where('user_id', $user->id)
+                    ->first();
+
+        if (!$cart) {
+            return response()->json([
+                "message" => "Cart item not found or you do not have permission to update it"
+            ], 404);
+        }
+
+        $cart->quantity -= 1;
+        $cart->save();
+
+        return response()->json([
+            "message" => "Cart item quantity increased successfully",
+            "cart" => $cart
         ], 200);
     }
 }

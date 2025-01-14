@@ -13,11 +13,15 @@ class Cart extends Model
     use HasApiTokens, HasFactory, Notifiable;
     use SoftDeletes;
 
-    protected $fillable = [
-        'user_id',
-        'store_id',
-        'product_id',
-        'product_quantity',
-        'price'
-    ];
+    protected $fillable = ['user_id', 'product_id', 'quantity', 'price'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }

@@ -23,14 +23,15 @@ use App\Http\Controllers\Illuminate\Support\Facades\Response;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
-Route::middleware('setapplang')->prefix('{locale}')->group(function(){
+
+//Route::middleware('setapplang')->prefix('{locale}')->group(function(){
 Route::post('/login',[AuthController::class,'login']);
 Route::post('/register',[AuthController::class,'register']);
 
-});
+//});
 
 // authorization changes when : Admin, Driver, User token based auth using api
-Route::group(['middleware' => ['auth:sanctum', 'role:admin']], function () {  // setapplang middleware
+Route::group(['middleware' => ['auth:sanctum'/*, 'role:admin'*/]], function () {  // setapplang middleware
     Route::get('/testrole',[TestController::class, 'test']);//test role
 
 
@@ -47,6 +48,7 @@ Route::group(['middleware' => ['auth:sanctum', 'role:admin']], function () {  //
     Route::delete('/product/delete', [ProductController::class, 'destroy']);*/
     Route::resource('products', ProductController::class);
     Route::get('products/search/{name}', [ProductController::class, 'search']);
+
     //Store:
     /*Route::get('/store/index', [ProductController::class, 'index']);
     Route::post('/store/store', [ProductController::class, 'store']);
@@ -58,8 +60,16 @@ Route::group(['middleware' => ['auth:sanctum', 'role:admin']], function () {  //
     Route::get('stores/search/{name}', [StoreController::class, 'search']);
 
     // Cart:
+    Route::delete('/cart', [CartController::class, 'destroy']);
+    Route::post('/cart/increase', [CartController::class, 'increase']);
+    Route::post('/cart/decrease', [CartController::class, 'decrease']);
     Route::resource('carts', CartController::class);
     Route::resource('orders', OrderController::class);
+
+    Route::get('/favorites', [FavoriteController::class, 'getProductFavorite']);
+    Route::post('/favorites/store', [FavoriteController::class, 'addProductFavorite']);
+    Route::delete('/favorite/delete', [FavoriteController::class, 'deleteProductFavorite']);
+
 });
 
 // test

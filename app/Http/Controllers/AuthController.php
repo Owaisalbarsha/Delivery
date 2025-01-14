@@ -122,22 +122,29 @@ class AuthController extends Controller
     // doesn't work as a PUT Http method; fix it
     public function personal_information(Request $request)
     {
-        $validate = Validator::make($request->all(),
-            [
-                "first_name" => 'regex:/^[a-zA-Z]{1,30}$/',
-                "last_name"  => 'regex:/^[a-zA-Z]{1,30}$/',
-                "location"   => 'regex:/^[a-zA-Z0-9\s,.-]{1,100}$/',
-                'image'      => 'image|mimes:jpeg,png,jpg,gif,svg',
-            ]);
+        // Validate the request
+        $validate = Validator::make($request->all(), [
+            "first_name" => 'nullable|regex:/^[a-zA-Z\s\'-]{1,30}$/',
+            "last_name"  => 'nullable|regex:/^[a-zA-Z\s\'-]{1,30}$/',
+            "location"   => 'nullable|regex:/^[a-zA-Z0-9\s,.-]{1,100}$/',
+            'image'      => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        // Return validation errors if any
         if ($validate->fails()) {
             return response()->json([
-                "Response Message" => "Invalid",
+                "Response Message" => "Validation Failed",
                 "Errors" => $validate->errors()
             ], 400);
         }
+
+        // Get validated data
         $validatedData = $validate->validated();
+
+        // Get the authenticated user
         $user = auth('api')->user();
-        // Update only if there is new data
+
+        // Update user data if new data is provided
         if (isset($validatedData['first_name'])) {
             $user->first_name = $validatedData['first_name'];
         }
@@ -147,13 +154,18 @@ class AuthController extends Controller
         if (isset($validatedData['location'])) {
             $user->location = $validatedData['location'];
         }
+
+        // Handle image upload
         if ($request->hasFile('image')) {
-            $fileName = time() . '_' . $request->file('image')->getClientOriginalName();
+            $fileName = uniqid() . '_' . $request->file('image')->getClientOriginalName();
             $path = $request->file('image')->storeAs('images', $fileName, 'public');
-            $validatedData["image"] = '/storage/' . $path;
-            $user->image = $validatedData["image"];
+            $user->image = '/storage/' . $path;
         }
+
+        // Save the updated user data
         $user->save();
+
+        // Return success response
         return response()->json([
             "Message" => "Updated successfully",
             "User" => $user,
