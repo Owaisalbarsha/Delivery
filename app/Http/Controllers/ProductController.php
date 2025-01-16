@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Store;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
@@ -38,21 +39,22 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(),[
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            //'company' => 'required|string|max:255',
             'quantity' => 'required|integer|min:1',
-            //'expiration_date' => 'required|date|after:today',
             'price' => 'required|numeric|min:0',
             'image' => 'required|image',
-            'brand' => 'required'
+            'brand' => 'required',
+            'store_name' => 'required',
         ]);
-        if($validator->fails())
+
+        if ($validator->fails()) {
             return response()->json([
                 "Response Message" => "Invalid Information",
                 "Errors" => $validator->errors()
-            ] , 400);
+            ], 400);
+        }
 
         $validatedData = $validator->validated();
 
@@ -62,10 +64,13 @@ class ProductController extends Controller
 
         $product = Product::create($validatedData);
 
+        $store = Store::where('name', $validatedData['store_name'])->first();
+        $store->products()->attach($product->id);
+
         return response()->json([
             "Response Message" => "Product added successfully",
             "Product" => $product,
-        ],200);
+        ], 200);
     }
 
     /**

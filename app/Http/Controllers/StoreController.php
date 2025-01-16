@@ -62,7 +62,7 @@ class StoreController extends Controller
         $validator = Validator::make($request->all(),[
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg',
             "location"   => 'regex:/^[a-zA-Z0-9\s,.-]{1,100}$/',
         ]);
         if($validator->fails())
@@ -81,7 +81,7 @@ class StoreController extends Controller
         $store = Store::create($validatedData);
 
         return response()->json([
-            "Response Message" => "Store added successfully",
+            "message" => "Store added successfully",
             "Store" => $store,
         ],200);
     }

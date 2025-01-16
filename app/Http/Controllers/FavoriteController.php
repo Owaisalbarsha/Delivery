@@ -34,21 +34,21 @@ class FavoriteController extends Controller
     public function getProductFavorite(Request $request){
 
         $user_id = auth('api')->user()->id;
-        $products=Favorite::where('user_id',$user_id)->with('product')->get();
+        $products = Favorite::where('user_id', $user_id)
+        ->with('product')
+        ->get()
+        ->pluck('product'); // Extract only the 'product' relationship
+        foreach($products as $fav)
+        {
+            $fav->image = asset('storage/images/' . basename($fav->image));
+        }
 
-        if($products->count()>0){
           return response()->json([
               'data'=>$products,
               'message'=>'success message',
-              'status'=>true
-          ]);
-        }
-
-        return response()->json([
-              'message'=>'products not found',
-              'status'=>false
-              ],400);
+          ], 200);
     }
+
     public function store(Request $request)
     {
        $validator = Validator::make($request->all(),[

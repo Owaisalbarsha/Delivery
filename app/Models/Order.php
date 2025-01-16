@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
+use App\Models\OderItem;
 
 class Order extends Model
 {
@@ -13,8 +16,13 @@ class Order extends Model
 
     protected $fillable = [
         'user_id',
-        'order_price',
-        'order_status',
-        //'pay_status',
+        'cost',
+        'state',
+        'location',
+        'pay_status'
     ];
+    public function items()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
 }

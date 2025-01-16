@@ -16,10 +16,12 @@ class CartController extends Controller
     public function index()
     {
         $user = auth('api')->user();
-        $cart = $user->carts()->with('product')->get();
-
+        $carts = $user->carts()->with('product')->get();
+        foreach ($carts as $cart) {
+            $cart->product->image = asset('storage/images/' . basename($cart->product->image));
+        }
         return response()->json([
-            "Cart" => $cart,
+            "Cart" => $carts,
             "Message : " => "Retrieved Successfully"
         ], 200);
     }
@@ -54,7 +56,7 @@ class CartController extends Controller
         if ($cartItem) {
             $cartItem->update([
                 'quantity' => $cartItem->quantity + $request->quantity,
-                'price' => $product->price * $request->quantity + $cartItem->price, // ضيف القديمة معها
+                'price' => $product->price * $request->quantity + $cartItem->price,
             ]);
         } else {
             $user->carts()->create([
@@ -137,6 +139,8 @@ class CartController extends Controller
         }
 
         $cart->quantity += 1;
+        $product = Product::find($request->product_id);
+        $cart->price += $product->price;
         $cart->save();
 
         return response()->json([
@@ -163,6 +167,8 @@ class CartController extends Controller
         }
 
         $cart->quantity -= 1;
+        $product = Product::find($request->product_id);
+        $cart->price -= $product->price;
         $cart->save();
 
         return response()->json([
